@@ -169,6 +169,8 @@ module lane_sequencer import ara_pkg::*; import rvv_pkg::*; import cf_math_pkg::
           id             : pe_req_i.id,
           op             : pe_req_i.op,
           vm             : pe_req_i.vm,
+          //vxsat          : pe_req_i.vxsat,
+          //vxrm           : pe_req_i.vxrm,
           vfu            : pe_req_i.vfu,
           use_vs1        : pe_req_i.use_vs1,
           use_vs2        : pe_req_i.use_vs2,
