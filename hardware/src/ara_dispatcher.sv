@@ -51,10 +51,14 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
   vlen_t  vstart_d, vstart_q;
   vlen_t  vl_d, vl_q;
   vtype_t vtype_d, vtype_q;
+  logic  vxsat_d, vxsat_q;
+  logic [1:0] vxrm_d, vxrm_q;
 
   `FF(vstart_q, vstart_d, '0)
   `FF(vl_q, vl_d, '0)
   `FF(vtype_q, vtype_d, '{vill: 1'b1, default: '0})
+  `FF(vxsat_q, vxsat_d, '0)
+  `FF(vxrm_q, vxrm_d, '0)
 
   // Converts between the internal representation of `vtype_t` and the full XLEN-bit CSR.
   function automatic riscv::xlen_t xlen_vtype(vtype_t vtype);
@@ -168,6 +172,8 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
     vl_d         = vl_q;
     vtype_d      = vtype_q;
     state_d      = state_q;
+    //vxsat_d      = vxsat_q;
+    //vxrm_d       = vxrm_q;
     eew_d        = eew_q;
     lmul_vs2     = vtype_q.vlmul;
     lmul_vs1     = vtype_q.vlmul;
@@ -195,6 +201,8 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
     ara_req_d = '{
       vl           : vl_q,
       vstart       : vstart_q,
+      //vxsat    : vxsat_q,
+      //vxrm     : vxrm_q,
       vtype        : vtype_q,
       emul         : vtype_q.vlmul,
       eew_vs1      : vtype_q.vsew,
@@ -407,6 +415,10 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
                   ara_req_d.op      = ara_pkg::VMERGE;
                   ara_req_d.use_vs2 = !insn.varith_type.vm; // vmv.v.v does not use vs2
                 end
+                6'b100000: ara_req_d.op = ara_pkg::VSADDU;
+                6'b100001: ara_req_d.op = ara_pkg::VSADD;
+                6'b100010: ara_req_d.op = ara_pkg::VSSUBU;
+                6'b100011: ara_req_d.op = ara_pkg::VSSUB;
                 6'b100101: ara_req_d.op = ara_pkg::VSLL;
                 6'b101000: ara_req_d.op = ara_pkg::VSRL;
                 6'b101001: ara_req_d.op = ara_pkg::VSRA;
@@ -593,6 +605,10 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
                   ara_req_d.op      = ara_pkg::VMERGE;
                   ara_req_d.use_vs2 = !insn.varith_type.vm; // vmv.v.x does not use vs2
                 end
+                6'b100000: ara_req_d.op = ara_pkg::VSADDU;
+                6'b100001: ara_req_d.op = ara_pkg::VSADD;
+                6'b100010: ara_req_d.op = ara_pkg::VSSUBU;
+                6'b100011: ara_req_d.op = ara_pkg::VSSUB;
                 6'b100101: ara_req_d.op = ara_pkg::VSLL;
                 6'b101000: ara_req_d.op = ara_pkg::VSRL;
                 6'b101001: ara_req_d.op = ara_pkg::VSRA;
@@ -739,6 +755,8 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
                   ara_req_d.op      = ara_pkg::VMERGE;
                   ara_req_d.use_vs2 = !insn.varith_type.vm; // vmv.v.i does not use vs2
                 end
+                6'b100000: ara_req_d.op = ara_pkg::VSADDU;
+                6'b100001: ara_req_d.op = ara_pkg::VSADD;
                 6'b100101: ara_req_d.op = ara_pkg::VSLL;
                 6'b100111: begin // vmv<nr>r.v
                   // Maximum vector length. VLMAX = simm[2:0] * VLEN / SEW.
@@ -836,6 +854,11 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
 
               // Decode based on the func6 field
               unique case (insn.varith_type.func6)
+                //Average Fixed-Point
+                6'b001000: ara_req_d.op = ara_pkg::VAADDU;
+                6'b001001: ara_req_d.op = ara_pkg::VAADD;
+                6'b001010: ara_req_d.op = ara_pkg::VASUBU;
+                6'b001011: ara_req_d.op = ara_pkg::VASUB;
                 6'b011000: begin
                   ara_req_d.op        = ara_pkg::VMANDNOT;
                   ara_req_d.use_vd_op = 1'b1;
@@ -1115,6 +1138,11 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
 
               // Decode based on the func6 field
               unique case (insn.varith_type.func6)
+                //Average Fixed-Point
+                6'b001000: ara_req_d.op = ara_pkg::VAADDU;
+                6'b001001: ara_req_d.op = ara_pkg::VAADD;
+                6'b001010: ara_req_d.op = ara_pkg::VASUBU;
+                6'b001011: ara_req_d.op = ara_pkg::VASUB;
                 // Slides
                 6'b001110: begin // vslide1up
                   ara_req_d.op     = ara_pkg::VSLIDEUP;
@@ -2135,6 +2163,10 @@ module ara_dispatcher import ara_pkg::*; import rvv_pkg::*; #(
                 riscv::CSR_VSTART: begin
                   vstart_d          = vlen_t'(acc_req_i.insn.itype.rs1);
                   acc_resp_o.result = vstart_q;
+                end
+                riscv::CSR_VXRM: begin
+                  vxrm_d            = acc_req_i.insn.itype.rs1[1:0];
+                  acc_resp_o.result = vlen_t'(vxrm_q);
                 end
                 default: acc_resp_o.error = 1'b1;
               endcase
