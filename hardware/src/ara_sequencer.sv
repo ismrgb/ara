@@ -210,6 +210,8 @@ module ara_sequencer import ara_pkg::*; import rvv_pkg::*; #(
               wide_fp_imm   : ara_req_i.wide_fp_imm,
               fp_cvt_resize : ara_req_i.fp_cvt_resize,
               vl            : ara_req_i.vl,
+              //vxsat         : ara_req_i.vxsat,
+              //vxrm          : ara_req_i.vxrm,
               vstart        : ara_req_i.vstart,
               vtype         : ara_req_i.vtype,
               vinsn_running : vinsn_running_d,
