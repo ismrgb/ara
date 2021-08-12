@@ -59,6 +59,14 @@ package rvv_pkg;
     OPMVX = 3'b110,
     OPCFG = 3'b111
   } opcodev_func3_e;
+  
+  // Fixed point arithmatic rouding mode
+  /*typedef enum logic [1:0] {
+    RNU = 2'b00,
+    RNE = 2'b01,
+    RDN = 2'b10,
+    ROD = 2'b11
+  } fxpt_rm;*/
 
   ///////////////////
   //  Vector CSRs  //
