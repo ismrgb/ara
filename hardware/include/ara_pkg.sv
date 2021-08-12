@@ -87,6 +87,8 @@ package ara_pkg;
   typedef enum logic [6:0] {
     // Arithmetic and logic instructions
     VADD, VSUB, VADC, VSBC, VRSUB, VMINU, VMIN, VMAXU, VMAX, VAND, VOR, VXOR,
+    // Fixed point
+    VSADDU, VSADD, VSSUBU, VSSUB, VAADDU, VAADD, VASUBU, VASUB,
     // Shifts,
     VSLL, VSRL, VSRA, VNSRL, VNSRA,
     // Merge
@@ -239,6 +241,10 @@ package ara_pkg;
     logic wide_fp_imm;
     // Resizing of FP conversions
     fp_resize_e fp_cvt_resize;
+    
+    // Fixed point CSRs
+    //logic       vxsat;
+    //logic [1:0] vxrm;
 
     // Vector machine metadata
     vlen_t vl;
@@ -327,6 +333,10 @@ package ara_pkg;
     logic wide_fp_imm;
     // Resizing of FP conversions
     fp_resize_e fp_cvt_resize;
+    
+    // Fixed point CSRs
+    //logic       vxsat;
+    //logic [1:0] vxrm;
 
     // Vector machine metadata
     vlen_t vl;
@@ -850,6 +860,10 @@ package ara_pkg;
     fpnew_pkg::roundmode_e fp_rm; // Rounding-Mode for FP operations
     logic wide_fp_imm;            // Widen FP immediate (re-encoding)
     fp_resize_e fp_cvt_resize;    // Resizing of FP conversions
+    
+    // Fixed point CSRs
+    //logic       vxsat;
+    //logic [1:0] vxrm;
 
     // Vector machine metadata
     vlen_t vl;
