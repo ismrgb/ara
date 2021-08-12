@@ -6,6 +6,12 @@
 #         Basile Bougenot <bbougenot@student.ethz.ch>
 
 rv64uv_sc_tests = vadd \
+                  vaadd \
+                  vaaddu\
+                  vsadd \
+                  vsaddu \
+                  vssub \
+                  vssubu \
                   vsub \
                   vrsub \
                   vwaddu \
